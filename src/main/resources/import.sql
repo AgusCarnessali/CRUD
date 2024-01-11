@@ -1,0 +1,1 @@
+INSERT INTO team_by_competition (id,matches_played,team_id,competition_id) VALUES (1,8,2,3);
