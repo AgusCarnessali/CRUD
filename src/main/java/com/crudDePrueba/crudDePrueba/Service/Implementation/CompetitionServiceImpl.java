@@ -2,10 +2,9 @@ package com.crudDePrueba.crudDePrueba.Service.Implementation;
 
 import com.crudDePrueba.crudDePrueba.Model.Entity.Competition;
 import com.crudDePrueba.crudDePrueba.Model.Entity.Team;
-import com.crudDePrueba.crudDePrueba.Model.Entity.TeamByCompetition;
+import com.crudDePrueba.crudDePrueba.Model.Entity.TeamCompetition;
 import com.crudDePrueba.crudDePrueba.Model.Record.CompetitionRecord;
-import com.crudDePrueba.crudDePrueba.Model.Record.TeamRecord;
-import com.crudDePrueba.crudDePrueba.Projection.CompetitionProjection;
+import com.crudDePrueba.crudDePrueba.Model.Record.TeamCompetitionRecord;
 import com.crudDePrueba.crudDePrueba.Projection.TeamProjection;
 import com.crudDePrueba.crudDePrueba.Repository.CompetitionRepository;
 import com.crudDePrueba.crudDePrueba.Repository.TeamByCompetitionRepository;
@@ -19,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
 @Service
 public class CompetitionServiceImpl implements CompetitionService {
     @Autowired
@@ -36,11 +36,9 @@ public class CompetitionServiceImpl implements CompetitionService {
 
     @Override
     public CompetitionRecord getCompetitionById(Long id) {
-        Optional<Competition> competition = competitionRepository.findById(id);
-        if (competition.isEmpty()) {
-            throw new RuntimeException("Couldn't find competition");
-        }
-        return competitionRecordBuilder(competition.get());
+        Competition competition = competitionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("competition not found"));
+        return competitionRecordBuilder(competition);
     }
 
     @Override
@@ -60,7 +58,7 @@ public class CompetitionServiceImpl implements CompetitionService {
 
     @Override
     public CompetitionRecord competitionRecordBuilder(Competition competition) {
-        return new CompetitionRecord(competition.getName(), competition.getPrice());
+        return new CompetitionRecord(competition.getName(), competition.getPrize());
     }
 
     @Override
@@ -69,31 +67,31 @@ public class CompetitionServiceImpl implements CompetitionService {
         Competition competition = new Competition();
         competition.setId(id);
         competition.setName(competitionRecord.name());
-        competition.setPrice(competitionRecord.price());
+        competition.setPrize(competitionRecord.prize());
 
         return competition;
     }
 
     @Override
-    public List<TeamByCompetition> addTeam(Long idCompetition, Long idTeam, Integer matchesPlayed) {
-        Competition competition = competitionRepository.findById(idCompetition)
+    public List<TeamCompetition> addTeam(TeamCompetitionRecord teamCompetitionRecord) {
+        Competition competition = competitionRepository.findById(teamCompetitionRecord.idComp())
                 .orElseThrow(() -> new RuntimeException("Competition not found"));
 
-        Team team = teamRepository.findById(idTeam)
+        Team team = teamRepository.findById(teamCompetitionRecord.idTeam())
                 .orElseThrow(() -> new RuntimeException("Team not found"));
 
-        Optional<TeamByCompetition> existingTeamByCompetition = competition.getTeamList().stream()
+        Optional<TeamCompetition> existingTeamByCompetition = competition.getTeamList().stream()
                 .filter(tc -> tc.getTeam().equals(team))
                 .findFirst();
 
         if (existingTeamByCompetition.isPresent()) {
-            existingTeamByCompetition.get().setMatchesPlayed(existingTeamByCompetition.get().getMatchesPlayed() + matchesPlayed);
+            existingTeamByCompetition.get().setMatchesPlayed(existingTeamByCompetition.get().getMatchesPlayed() + teamCompetitionRecord.matches());
         } else {
-            TeamByCompetition newTeamByCompetition = new TeamByCompetition();
-            newTeamByCompetition.setTeam(team);
-            newTeamByCompetition.setCompetition(competition);
-            newTeamByCompetition.setMatchesPlayed(matchesPlayed);
-            competition.getTeamList().add(newTeamByCompetition);
+            TeamCompetition newTeamCompetition = new TeamCompetition();
+            newTeamCompetition.setTeam(team);
+            newTeamCompetition.setCompetition(competition);
+            newTeamCompetition.setMatchesPlayed(teamCompetitionRecord.matches());
+            competition.getTeamList().add(newTeamCompetition);
         }
 
         competitionRepository.saveAndFlush(competition);

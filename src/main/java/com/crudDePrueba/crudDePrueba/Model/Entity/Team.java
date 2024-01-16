@@ -41,7 +41,7 @@ public class Team {
     private Integer fans;
 
     @OneToMany(mappedBy = "team",fetch = FetchType.EAGER,cascade = CascadeType.ALL)
-    private List<TeamByCompetition> competitionList = new ArrayList<>();
+    private List<TeamCompetition> competitionList = new ArrayList<>();
 
     @Override
     public String toString() {

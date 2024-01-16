@@ -35,10 +35,10 @@ public class Competition {
     @NotEmpty
     private String name;
     @NotNull
-    private Float price;
+    private Float prize;
 
     @OneToMany(mappedBy = "competition", fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    List<TeamByCompetition> teamList = new ArrayList<>();
+    List<TeamCompetition> teamList = new ArrayList<>();
 
     @Override
     public boolean equals(Object o) {
@@ -58,7 +58,7 @@ public class Competition {
         return "Competition{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", price=" + price +
+                ", prize=" + prize +
                 ", teamList=" + teamList +
                 '}';
     }

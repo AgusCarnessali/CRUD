@@ -2,14 +2,14 @@ package com.crudDePrueba.crudDePrueba.Service.Implementation;
 
 import com.crudDePrueba.crudDePrueba.Model.Entity.Competition;
 import com.crudDePrueba.crudDePrueba.Model.Entity.Team;
-import com.crudDePrueba.crudDePrueba.Model.Entity.TeamByCompetition;
+import com.crudDePrueba.crudDePrueba.Model.Entity.TeamCompetition;
+import com.crudDePrueba.crudDePrueba.Model.Record.TeamCompetitionRecord;
 import com.crudDePrueba.crudDePrueba.Model.Record.TeamRecord;
 import com.crudDePrueba.crudDePrueba.Projection.CompetitionProjection;
 import com.crudDePrueba.crudDePrueba.Repository.CompetitionRepository;
 import com.crudDePrueba.crudDePrueba.Repository.TeamByCompetitionRepository;
 import com.crudDePrueba.crudDePrueba.Repository.TeamRepository;
 import com.crudDePrueba.crudDePrueba.Service.Interface.TeamService;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,11 +36,8 @@ public class TeamServiceImpl implements TeamService {
 
     @Override
     public TeamRecord getTeamById(Long id) throws RuntimeException {
-        Optional<Team> team = teamRepository.findById(id);
-        if (team.isEmpty()) {
-            throw new RuntimeException("Team not found");       //HACER UNA EXCEPTION CUSTOM
-        }
-        return teamRecordBuilder(team.get());
+        Team team = teamRepository.findById(id).orElseThrow(()->new RuntimeException("Team not found"));
+        return teamRecordBuilder(team);
     }
 
     @Override
@@ -74,26 +71,25 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<TeamByCompetition> addCompetition(Long idTeam, Long idCompetition, Integer matchesPlayed) {
-        Team team = teamRepository.findById(idTeam)
+    public List<TeamCompetition> addCompetition(TeamCompetitionRecord teamCompetitionRecord) {
+        Team team = teamRepository.findById(teamCompetitionRecord.idTeam())
                 .orElseThrow(() -> new RuntimeException("Team not found"));
 
-        Competition competition = competitionRepository.findById(idCompetition)
+        Competition competition = competitionRepository.findById(teamCompetitionRecord.idComp())
                 .orElseThrow(() -> new RuntimeException("Competition not found"));
 
-        Optional<TeamByCompetition> existingTeamByCompetition = team.getCompetitionList().stream()
+        Optional<TeamCompetition> existingTeamByCompetition = team.getCompetitionList().stream()
                 .filter(tc -> tc.getCompetition().equals(competition))
                 .findFirst();
 
         if (existingTeamByCompetition.isPresent()) {
-
-            existingTeamByCompetition.get().setMatchesPlayed(existingTeamByCompetition.get().getMatchesPlayed() + matchesPlayed);
+            existingTeamByCompetition.get().setMatchesPlayed(existingTeamByCompetition.get().getMatchesPlayed() + teamCompetitionRecord.matches());
         } else {
-            TeamByCompetition newTeamByCompetition = new TeamByCompetition();
-            newTeamByCompetition.setTeam(team);
-            newTeamByCompetition.setCompetition(competition);
-            newTeamByCompetition.setMatchesPlayed(matchesPlayed);
-            team.getCompetitionList().add(newTeamByCompetition);
+            TeamCompetition newTeamCompetition = new TeamCompetition();
+            newTeamCompetition.setTeam(team);
+            newTeamCompetition.setCompetition(competition);
+            newTeamCompetition.setMatchesPlayed(teamCompetitionRecord.matches());
+            team.getCompetitionList().add(newTeamCompetition);
         }
 
         teamRepository.saveAndFlush(team);

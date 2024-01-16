@@ -27,7 +27,7 @@ import java.util.Objects;
 @AllArgsConstructor
 @Builder
 @Table(name = "team_by_competition")
-public class TeamByCompetition implements Serializable {
+public class TeamCompetition implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -48,7 +48,7 @@ public class TeamByCompetition implements Serializable {
 
     @Override
     public String toString() {
-        return "TeamByCompetition{" +
+        return "TeamCompetition{" +
                 "id=" + id +
                 ", matchesPlayed=" + matchesPlayed ;
     }
@@ -57,7 +57,7 @@ public class TeamByCompetition implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TeamByCompetition that = (TeamByCompetition) o;
+        TeamCompetition that = (TeamCompetition) o;
         return Objects.equals(id, that.id) && Objects.equals(matchesPlayed, that.matchesPlayed) && Objects.equals(team, that.team) && Objects.equals(competition, that.competition);
     }
 

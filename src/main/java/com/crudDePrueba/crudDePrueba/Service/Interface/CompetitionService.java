@@ -1,10 +1,9 @@
 package com.crudDePrueba.crudDePrueba.Service.Interface;
 
 import com.crudDePrueba.crudDePrueba.Model.Entity.Competition;
-import com.crudDePrueba.crudDePrueba.Model.Entity.TeamByCompetition;
+import com.crudDePrueba.crudDePrueba.Model.Entity.TeamCompetition;
 import com.crudDePrueba.crudDePrueba.Model.Record.CompetitionRecord;
-import com.crudDePrueba.crudDePrueba.Model.Record.TeamRecord;
-import com.crudDePrueba.crudDePrueba.Projection.CompetitionProjection;
+import com.crudDePrueba.crudDePrueba.Model.Record.TeamCompetitionRecord;
 import com.crudDePrueba.crudDePrueba.Projection.TeamProjection;
 
 import java.util.List;
@@ -25,6 +24,6 @@ public interface CompetitionService {
 
     Competition competitionBuilder(CompetitionRecord competitionRecord,Long id);
 
-    List<TeamByCompetition> addTeam(Long idCompetition, Long idTeam, Integer matchesPlayed);
+    List<TeamCompetition> addTeam(TeamCompetitionRecord teamCompetitionRecord);
     Map<String, List<TeamProjection>> getTeamsByCompetitionId(Long compId);
 }

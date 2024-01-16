@@ -1,8 +1,9 @@
 package com.crudDePrueba.crudDePrueba.Controller;
 
 import com.crudDePrueba.crudDePrueba.Model.Entity.Competition;
-import com.crudDePrueba.crudDePrueba.Model.Entity.TeamByCompetition;
+import com.crudDePrueba.crudDePrueba.Model.Entity.TeamCompetition;
 import com.crudDePrueba.crudDePrueba.Model.Record.CompetitionRecord;
+import com.crudDePrueba.crudDePrueba.Model.Record.TeamCompetitionRecord;
 import com.crudDePrueba.crudDePrueba.Projection.TeamProjection;
 import com.crudDePrueba.crudDePrueba.Service.Interface.CompetitionService;
 import jakarta.validation.Valid;
@@ -53,16 +54,13 @@ public class CompetitionController {
         competitionService.delete(id);
     }
 
-    @PutMapping("/teams/{compId}/{teamId}/{matches}")
-    public ResponseEntity<List<TeamByCompetition>> addTeam(
-            @PathVariable("compId") Long compId,
-            @PathVariable("teamId") Long teamId,
-            @PathVariable("matches") Integer matches) {
-        return new ResponseEntity<>(competitionService.addTeam(compId, teamId, matches), HttpStatus.CREATED);
+    @PutMapping("/teams")
+    public ResponseEntity<List<TeamCompetition>> addTeam(@RequestBody TeamCompetitionRecord teamCompetitionRecord) {
+        return new ResponseEntity<>(competitionService.addTeam(teamCompetitionRecord), HttpStatus.CREATED);
     }
 
     @GetMapping("teambycompetition/{compId}")
-    public ResponseEntity<Map<String,List<TeamProjection>>> getTeamsByCompetitionId(@PathVariable("compId")Long id){
-        return new ResponseEntity<>(competitionService.getTeamsByCompetitionId(id),HttpStatus.OK);
+    public ResponseEntity<Map<String, List<TeamProjection>>> getTeamsByCompetitionId(@PathVariable("compId") Long id) {
+        return new ResponseEntity<>(competitionService.getTeamsByCompetitionId(id), HttpStatus.OK);
     }
 }
